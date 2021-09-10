@@ -1,18 +1,31 @@
-import pygame, sys
+import pygame, sys, random
 
 from pygame.constants import KEYDOWN
 
 class Crosshair(pygame.sprite.Sprite):
-    def __init__(self, width, height, pos_x, pos_y, color):
+    def __init__(self, picture_path):
         # Inheritance from Sprite class
         super().__init__()
         # Create empty surface image with given height and width
-        self.image = pygame.Surface([width, height])
-        # Fill empty surface with color
-        self.image.fill(color)
+        self.image = pygame.image.load(picture_path)
         # Draw rectangle around surface
         self.rect = self.image.get_rect()
-        # Position rectangle at X and Y coordinate
+        self.gunshot = pygame.mixer.Sound('gunshot.wav')
+    
+    def shoot(self):
+        self.gunshot.play()
+        # When crosshair overlaps group, will remove target_group
+        pygame.sprite.spritecollide(crosshair, target_group, True)
+
+    # Update mouse pointer to crosshair image
+    def update(self):
+        self.rect.center = pygame.mouse.get_pos()
+
+class Target(pygame.sprite.Sprite):
+    def __init__(self, picture_path, pos_x, pos_y):
+        super().__init__()
+        self.image = pygame.image.load(picture_path)
+        self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
 
 # General setup
@@ -23,15 +36,20 @@ clock = pygame.time.Clock()
 screen_width =  800
 screen_height = 600
 screen = pygame.display.set_mode((screen_width, screen_height))
+background = pygame.image.load('background.png')
+# Hide mouse pointer inside game. Will replace with crosshair
+pygame.mouse.set_visible(False)
 
-# Width and Height = 50 pixels, X and Y positions = 100, color = white (255, 255, 255)
-crosshair = Crosshair(50,50,100,100,(255,255,255))
-
-# Add group of crosshairs
+# Crosshair
+crosshair = Crosshair('crosshair.png')
 crosshair_group = pygame.sprite.Group()
 crosshair_group.add(crosshair)
 
-
+# Target
+target_group = pygame.sprite.Group()
+for target in range(20):
+    new_target = Target('target.png', random.randrange(0, screen_width), random.randrange(0, screen_height))
+    target_group.add(new_target)
 
 # Main game loop
 while True:
@@ -39,7 +57,12 @@ while True:
         if event.type == pygame.QUIT or (event.type == KEYDOWN and pygame.K_ESCAPE):
             pygame.quit()
             sys.exit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            crosshair.shoot()
 
         pygame.display.flip()
+        screen.blit(background, (0,0))
+        target_group.draw(screen)
         crosshair_group.draw(screen)
+        crosshair_group.update()
         clock.tick(60)
