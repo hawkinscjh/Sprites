@@ -28,9 +28,52 @@ class Target(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
 
+class GameState():
+    def __init__(self):
+        self.state = 'intro'
+
+    def intro(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or (event.type == KEYDOWN and pygame.K_ESCAPE):
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                self.state = 'main_game'
+
+        # Drawing
+        
+        screen.blit(background, (0,0))
+        screen.blit(ready_text, (screen_width/2 - 118, screen_height/2 - 40))
+        crosshair_group.draw(screen)
+        crosshair_group.update()
+        pygame.display.flip()
+
+    def main_game(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or (event.type == KEYDOWN and pygame.K_ESCAPE):
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                crosshair.shoot()
+
+        # Drawing
+        
+        screen.blit(background, (0,0))
+        target_group.draw(screen)
+        crosshair_group.draw(screen)
+        crosshair_group.update()
+        pygame.display.flip()
+
+    def state_manager(self):
+        if self.state == 'intro':
+            self.intro()
+        if self.state == 'main_game':
+            self.main_game()
+
 # General setup
 pygame.init()
 clock = pygame.time.Clock()
+game_state = GameState()
 
 # Game screen
 screen_width =  800
@@ -39,6 +82,9 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 background = pygame.image.load('background.png')
 # Hide mouse pointer inside game. Will replace with crosshair
 pygame.mouse.set_visible(False)
+
+center_font = pygame.font.Font('freesansbold.ttf', 64)
+ready_text = center_font.render("READY", True, (255, 255, 255))
 
 # Crosshair
 crosshair = Crosshair('crosshair.png')
@@ -53,16 +99,5 @@ for target in range(20):
 
 # Main game loop
 while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT or (event.type == KEYDOWN and pygame.K_ESCAPE):
-            pygame.quit()
-            sys.exit()
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            crosshair.shoot()
-
-        pygame.display.flip()
-        screen.blit(background, (0,0))
-        target_group.draw(screen)
-        crosshair_group.draw(screen)
-        crosshair_group.update()
+        game_state.state_manager()
         clock.tick(60)
