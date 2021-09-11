@@ -41,7 +41,6 @@ class GameState():
                 self.state = 'main_game'
 
         # Drawing
-        
         screen.blit(background, (0,0))
         screen.blit(ready_text, (screen_width/2 - 118, screen_height/2 - 40))
         crosshair_group.draw(screen)
@@ -57,7 +56,6 @@ class GameState():
                 crosshair.shoot()
 
         # Drawing
-        
         screen.blit(background, (0,0))
         target_group.draw(screen)
         crosshair_group.draw(screen)
