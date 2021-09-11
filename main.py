@@ -3,7 +3,7 @@ import pygame, sys, random
 from pygame.constants import KEYDOWN
 
 class Crosshair(pygame.sprite.Sprite):
-    def __init__(self, picture_path):
+    def __init__(self, picture_path, score):
         # Inheritance from Sprite class
         super().__init__()
         # Create empty surface image with given height and width
@@ -11,11 +11,15 @@ class Crosshair(pygame.sprite.Sprite):
         # Draw rectangle around surface
         self.rect = self.image.get_rect()
         self.gunshot = pygame.mixer.Sound('gunshot.wav')
+        self.score = 0
     
     def shoot(self):
         self.gunshot.play()
         # When crosshair overlaps group, will remove target_group
-        pygame.sprite.spritecollide(crosshair, target_group, True)
+        if pygame.sprite.spritecollide(crosshair, target_group, True):
+        
+            self.score += 1
+            print(self.score)
 
     # Update mouse pointer to crosshair image
     def update(self):
@@ -54,10 +58,26 @@ class GameState():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 crosshair.shoot()
+        
+        if crosshair.score >= 5:
+            self.state = 'game_over'
 
         # Drawing
         screen.blit(background, (0,0))
         target_group.draw(screen)
+        crosshair_group.draw(screen)
+        crosshair_group.update()
+        pygame.display.flip()
+
+    def game_over(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or (event.type == KEYDOWN and pygame.K_ESCAPE):
+                pygame.quit()
+                sys.exit()
+
+        # Drawing
+        screen.blit(background, (0,0))
+        screen.blit(over_text, (screen_width/2 - 118, screen_height/2 - 40))
         crosshair_group.draw(screen)
         crosshair_group.update()
         pygame.display.flip()
@@ -67,6 +87,8 @@ class GameState():
             self.intro()
         if self.state == 'main_game':
             self.main_game()
+        if self.state == 'game_over':
+            self.game_over()
 
 # General setup
 pygame.init()
@@ -80,12 +102,13 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 background = pygame.image.load('background.png')
 # Hide mouse pointer inside game. Will replace with crosshair
 pygame.mouse.set_visible(False)
-
+# Font and text for intro
 center_font = pygame.font.Font('freesansbold.ttf', 64)
 ready_text = center_font.render("READY", True, (255, 255, 255))
+over_text = center_font.render("GAME OVER", True, (255, 255, 255))
 
 # Crosshair
-crosshair = Crosshair('crosshair.png')
+crosshair = Crosshair('crosshair.png', 0)
 crosshair_group = pygame.sprite.Group()
 crosshair_group.add(crosshair)
 
