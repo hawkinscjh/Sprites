@@ -1,4 +1,5 @@
 import pygame, sys, random
+
 from pygame.constants import KEYDOWN
 
 class Crosshair(pygame.sprite.Sprite):
@@ -37,7 +38,7 @@ class GameState():
 
     def intro(self):
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == pygame.K_ESCAPE):
+            if event.type == pygame.QUIT or (event.type == KEYDOWN and pygame.K_ESCAPE):
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -52,7 +53,7 @@ class GameState():
 
     def main_game(self):
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == pygame.K_ESCAPE):
+            if event.type == pygame.QUIT or (event.type == KEYDOWN and pygame.K_ESCAPE):
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -70,7 +71,7 @@ class GameState():
 
     def game_over(self):
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == pygame.K_ESCAPE):
+            if event.type == pygame.QUIT or (event.type == KEYDOWN and pygame.K_ESCAPE):
                 pygame.quit()
                 sys.exit()
 
@@ -119,5 +120,5 @@ for target in range(20):
 
 # Main game loop
 while True:
-    game_state.state_manager()
-    clock.tick(60)
+        game_state.state_manager()
+        clock.tick(60)
